@@ -140,7 +140,11 @@ class JuniorAgent(BaseMinerNeuron):
     Result: {l.feedback}
 """
 
-        llm_client = AsyncOpenAI(http_client=self.http_client)
+        llm_client = AsyncOpenAI(
+    http_client=self.http_client,
+    api_key=self.config.eastworld.deepseek_api_key,  # Thêm biến này vào config nếu chưa có
+    base_url="https://api.deepseek.com/v1"
+)
         try:
             reflection_context = {
                 "tasks": tasks,

@@ -25,6 +25,8 @@ import bittensor as bt
 
 from .logging import setup_events_logger
 
+from dotenv import load_dotenv
+import os
 
 def is_cuda_available():
     try:
@@ -45,6 +47,13 @@ def is_cuda_available():
 def check_config(cls, config: "bt.Config"):
     r"""Checks/validates the config namespace object."""
     bt.logging.check_config(config)
+
+    # Load biến môi trường từ file .env (nếu có)
+    load_dotenv()
+
+    # Bổ sung deepseek_api_key vào config nếu chưa có
+    if not hasattr(config.eastworld, 'deepseek_api_key') or not config.eastworld.deepseek_api_key:
+        config.eastworld.deepseek_api_key = os.getenv("DEEPSEEK_API_KEY", "YOUR_DEEPSEEK_API_KEY")
 
     full_path = os.path.expanduser(
         "{}/{}/{}/netuid{}/{}".format(
