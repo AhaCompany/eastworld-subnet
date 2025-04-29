@@ -151,9 +151,9 @@ class SeniorAgent(BaseMinerNeuron):
     api_key=self.config.eastworld.deepseek_api_key,  # Thêm biến này vào config nếu chưa có
     base_url="https://api.deepseek.com/v1"
 )
-        self.model_small = "gemini-2.0-flash-lite"
-        self.model_medium = "gemini-2.0-flash"
-        self.model_large = "gemini-2.0-flash"
+        self.model_small = "deepseek-reasoner"
+        self.model_medium = "deepseek-reasoner"
+        self.model_large = "deepseek-reasoner"
 
         prompt_dir = "eastworld/miner/prompts"
         self.landmark_annotation_step = 0
