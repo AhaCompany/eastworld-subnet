@@ -1,25 +1,32 @@
-Based on the given environment information, your action logs and available tools, reflect on the rationality and effectiveness of previous actions and output thoughts on the next action to successfully advance your primary tasks.
+Based on the given environment information, your action logs and available tools, reflect on the rationality and effectiveness of previous actions and output thoughts on the next action to successfully advance your primary tasks with a focus on QUEST COMPLETION.
 
 
 # Steps:
 
-1. Review Action Log:
-Pay special attention to the results of the last action, which is the last record in the log. Summarize key historical actions and identify past successes or failures, noting what tools and functions were used and their outcomes. 
+1. Quest Analysis & Prioritization:
+   - Identify all potential quests from perception data and task list
+   - Evaluate each quest by: estimated point value, completion difficulty, and proximity
+   - Assign TOP, MEDIUM, or LOW priority to each quest
+   - For TOP priority quests, develop specific completion plans
 
-2. Prioritize Tasks:
-Review the task list and determine which task has the highest priority based on urgency and dependencies.
+2. Review Action Log:
+   Pay special attention to the results of the last action. Identify patterns of successful quest completions, not just movement. Note which actions led to quest progress or rewards. Recognize recurring patterns that consistently lead to quest discoveries.
 
 3. Analyze Environment Data:
-Examine the latest environmental data, including LiDAR scanner readings, location observations, and status updates. Assess any potential obstacles or hazards that could affect task completion. If the LiDAR data indicates a blockage in a particular direction, adjust your route to bypass it, rather than backtracking along the original path.
+   - Focus on identifying landmarks, resources, and interactive elements that might trigger quests
+   - Use LiDAR data primarily to plan routes to quest locations, not just for exploration
+   - Identify patterns in the environment that may indicate quest opportunities (unusual structures, item clusters, NPCs)
+   - Look for environmental anomalies that often correlate with high-value quests
 
 4. Reflection:
-Using insights from your analysis, review previous reflections and plans. Based on the new thoughts and environmental changes, plan your next direct action.
+   Evaluate your progress toward QUEST COMPLETION, not just exploration. Determine if your current strategy is maximizing quest rewards (70% of your total score).
 
 # Guidelines
-- Maintain consistency: Build on what worked before, rather than making abrupt or contradictory changes.
-- Adhere to constraints: Only use the move_to_target function call when you have the detail location of the target.
-- Focus on next action: The output should be concise, clear, and in first-person language, focusing on the next action.
-- Plain text output: The output should be in plain text, without any special formatting or characters. 
+- Quest-first approach: Prioritize actions that directly advance quest objectives over general exploration
+- Strategic movement: Only move to areas that have potential quest value or lead to unexplored regions with quest potential
+- Resource management: Collect items specifically needed for high-value quests
+- Pattern recognition: Identify environmental patterns that correlate with quest opportunities
+- Balance immediate rewards with long-term goals: Prioritize quests with highest points/effort ratio
 
 # Tasks and Priorities
 {tasks}

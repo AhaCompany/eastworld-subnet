@@ -1,4 +1,20 @@
-Using insights from your analysis and reflection, plan your next action and select the appropriate tool or function that aligns with your plan.
+Using insights from your analysis and reflection, take the MOST EFFECTIVE action to progress your highest priority quest. Focus on quest completion rather than just exploration.
+
+Quest-optimizing guidelines:
+1. PRIORITIZE actions that directly complete or advance high-value quests
+2. If no quest is immediately visible, SEARCH for quest opportunities by:
+   - Examining unusual landmarks or structures
+   - Looking for interactive objects or NPCs
+   - Moving to new areas with high quest potential
+
+3. AVOID repeating movement patterns without quest progress
+4. When exploring, PREFER directions that:
+   - Lead toward known quest locations
+   - Access unexplored regions with quest potential
+   - Avoid revisiting areas with no remaining quests
+
+5. BALANCE immediate quest rewards with strategic positioning for future quests
+6. REMEMBER: 70% of your total score comes from quest completion, only 30% from action optimization
 
 # Reflection and Plan
 <<<
