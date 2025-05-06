@@ -175,11 +175,41 @@ class JuniorAgent(BaseMinerNeuron):
         blocked_dirs = self.miner_memory.get_blocked_directions(current_quest)
         recent_actions = self.miner_memory.get_recent_actions(current_quest)
 
-        action_log = ""
-        for idx, (action, direction, result, feedback, reflection) in enumerate(recent_actions):
-            action_log += f"- {action} ({direction}), Result: {result}, Feedback: {feedback}\n"
+        # Lấy ID của các action gần đây
+        action_ids = []
+        try:
+            c = self.miner_memory.conn.cursor()
+            c.execute('''
+                SELECT id, action, direction, result, feedback 
+                FROM actions
+                WHERE quest=?
+                ORDER BY id DESC
+                LIMIT 50
+            ''', (current_quest,))
+            
+            action_details = c.fetchall()
+            action_log = ""
+            
+            if action_details:
+                for row in action_details:
+                    action_id, action, direction, result, feedback = row
+                    direction_str = f"({direction})" if direction else ""
+                    action_log += f"#{action_id}: {action} {direction_str}, Result: {result}, Feedback: {feedback}\n"
+            else:
+                # Fallback nếu không lấy được ID từ DB
+                for idx, (action, direction, result, feedback, reflection) in enumerate(recent_actions):
+                    direction_str = f"({direction})" if direction else ""
+                    action_log += f"#{idx+1}: {action} {direction_str}, Result: {result}, Feedback: {feedback}\n"
+        except Exception as e:
+            bt.logging.error(f"Error getting action IDs: {e}")
+            # Fallback nếu có lỗi
+            action_log = ""
+            for idx, (action, direction, result, feedback, reflection) in enumerate(recent_actions):
+                direction_str = f"({direction})" if direction else ""
+                action_log += f"#{idx+1}: {action} {direction_str}, Result: {result}, Feedback: {feedback}\n"
+        
         blocked_dirs_str = ', '.join([d for d in blocked_dirs if d])
-
+        
         tasks = getattr(synapse, 'tasks', [])
         lidar = getattr(synapse, 'lidar', 'N/A')
         odometry = getattr(synapse, 'odometry', 'N/A')
