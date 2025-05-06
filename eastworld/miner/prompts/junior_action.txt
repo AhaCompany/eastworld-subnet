@@ -1,6 +1,13 @@
-Using insights from your analysis and reflection, plan your next action and select the appropriate tool or function that aligns with your plan.
+[Action Context]
+- Current Quest: {tasks}
+- Recent Reflection: {reflection}
+- Blocked Directions (avoid): {blocked_dirs}
+- Inventory Full: {inventory_full}
 
-# Reflection and Plan
-<<<
-{reflection}
->>>
+[Instructions]
+1. Propose the single best action that will most efficiently advance quest completion, strictly avoiding blocked directions and repeated failures.
+2. Only suggest collect if inventory is not full, and only inspect/check if the target is in sight and within range.
+3. If all direct actions are blocked, recommend a new route or intermediate step to get closer to the quest objective.
+4. Be concise and decisive. Do not repeat failed strategies.
+
+Your output must be a single, clear action or plan that best serves the supreme goal: maximize quest score and total score.

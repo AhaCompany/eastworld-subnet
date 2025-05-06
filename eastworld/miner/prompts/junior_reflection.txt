@@ -21,6 +21,26 @@ Using insights from your analysis, review previous reflections and plans. Based 
 - Focus on next action: The output should be concise, clear, and in first-person language, focusing on the next action.
 - Plain text output: The output should be in plain text, without any special formatting or characters. 
 
+[Reflection Context]
+- Current Quest: {tasks}
+- Recent Action Log:
+{action_log}
+- Blocked Directions (avoid): {blocked_dirs}
+- Inventory Full: {inventory_full}
+- LiDAR: {lidar}
+- Odometry: {odometry}
+- Perception: {perception}
+- Items: {items}
+- Tools: {tool_list}
+
+[Instructions]
+1. Review the most recent actions and feedback. Identify any repeated failures, blocked directions, or inventory issues.
+2. Reflect on whether the last action advanced the quest. If not, diagnose the cause (e.g., obstacle, inventory full, target not in sight/too far).
+3. Propose a concise adjustment or new plan to maximize quest progress, strictly avoiding previously failed actions or blocked paths.
+4. If stuck, recommend a new direction, strategy, or plan based on the latest environment and logs.
+
+Your reflection must be actionable, focused on quest progress, and leverage all recent experience and environmental data.
+
 # Tasks and Priorities
 {tasks}
 
