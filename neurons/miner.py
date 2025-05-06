@@ -102,7 +102,7 @@ class WanderAgent(BaseMinerNeuron):
 if __name__ == "__main__":
     load_dotenv()
 
-    with SeniorAgent(slam_data=None) as miner:  # Sử dụng SeniorAgent để đạt điểm cao hơn
+    with SeniorAgent(slam_data=None, use_fastslam=True) as miner:  # Sử dụng SeniorAgent để đạt điểm cao hơn
         while True:
             bt.logging.info(f"Miner is running... {time.time()}")
             time.sleep(30)
