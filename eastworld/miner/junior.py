@@ -262,18 +262,22 @@ class JuniorAgent(BaseMinerNeuron):
             self.push_reflection_memory(reflection)
             bt.logging.debug(self.memory_reflection[-1], ">>>> Reflection")
 
-            # Luôn log action với reflection bất kể có recent_actions hay không
+            # Sử dụng reflection để suy nghĩ về action trước đó và cập nhật nó
+            recent_actions = self.miner_memory.get_recent_actions(limit=1, filter_by={})
             if recent_actions:
                 last_action = recent_actions[0]
-                bt.logging.info(f"MinerMemory: Updating existing action with reflection: {last_action[0]}")
-                self.miner_memory.log_action(
-                    quest=current_quest,
-                    action=last_action[0],
-                    direction=last_action[1],
-                    result=last_action[2],
-                    feedback=last_action[3],
-                    reflection=reflection
-                )
+                bt.logging.info(f"MinerMemory: Updating existing action reflection: {last_action[0]}")
+                try:
+                    c = self.miner_memory.conn.cursor()
+                    c.execute('''
+                        UPDATE actions SET reflection = ?
+                        WHERE action = ? AND direction = ? AND result = ? AND feedback = ?
+                        ORDER BY id DESC LIMIT 1
+                    ''', (reflection, last_action[0], last_action[1], last_action[2], last_action[3]))
+                    self.miner_memory.conn.commit()
+                    bt.logging.info(f"MinerMemory: Successfully updated reflection for {last_action[0]}")
+                except Exception as e:
+                    bt.logging.error(f"Error updating reflection: {e}")
             else:
                 bt.logging.info(f"MinerMemory: Logging new action with reflection: ")
                 self.miner_memory.log_action(
@@ -325,19 +329,42 @@ class JuniorAgent(BaseMinerNeuron):
                         [f"{k}: {v}" for k, v in parsed_action["arguments"].items()]
                     )
                 )
-                # Luôn log action mới, không phụ thuộc vào recent_actions
-                # Use bt.logging.info để dễ debug
-                bt.logging.info(f"MinerMemory: Logging new action: {parsed_action['name']}")
-                log_success = self.miner_memory.log_action(
-                    quest=current_quest,
-                    action=parsed_action["name"],
-                    direction=parsed_action["arguments"].get("direction", ""),
-                    result="pending",  # Will be updated after feedback
-                    feedback="",
-                    reflection=""
-                )
-                if not log_success:
-                    bt.logging.warning(f"MinerMemory: Failed to log new action {parsed_action['name']}")
+                
+                # Chỉ log action nếu chưa có action nào với name và direction giống hệt trong 1 phút qua
+                # Điều này giúp tránh log trùng lặp
+                should_log = True
+                try:
+                    direction = parsed_action["arguments"].get("direction", "")
+                    c = self.miner_memory.conn.cursor()
+                    # Kiểm tra xem có action tương tự gần đây không (trong 60 giây)
+                    one_minute_ago = (datetime.datetime.now() - datetime.timedelta(seconds=60)).isoformat()
+                    c.execute('''
+                        SELECT id FROM actions 
+                        WHERE action = ? AND direction = ? AND timestamp > ?
+                        ORDER BY id DESC LIMIT 1
+                    ''', (parsed_action["name"], direction, one_minute_ago))
+                    
+                    recent_similar = c.fetchone()
+                    if recent_similar:
+                        # Đã có action tương tự gần đây, không log lại
+                        bt.logging.info(f"MinerMemory: Skip logging duplicate action: {parsed_action['name']}")
+                        should_log = False
+                except Exception as e:
+                    bt.logging.error(f"Error checking for duplicate actions: {e}")
+                
+                # Chỉ log nếu không phải trùng lặp
+                if should_log:
+                    bt.logging.info(f"MinerMemory: Logging new action: {parsed_action['name']}")
+                    log_success = self.miner_memory.log_action(
+                        quest=current_quest,
+                        action=parsed_action["name"],
+                        direction=parsed_action["arguments"].get("direction", ""),
+                        result="pending",  # Will be updated after feedback
+                        feedback="",
+                        reflection=""
+                    )
+                    if not log_success:
+                        bt.logging.warning(f"MinerMemory: Failed to log new action {parsed_action['name']}")
         except APITimeoutError as e:
             bt.logging.error(f"API Timeout Error: {e}")
         except Exception as e:
