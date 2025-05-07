@@ -33,7 +33,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from eastworld.base.miner import BaseMinerNeuron
 from eastworld.miner.slam.grid import ANONYMOUS_NODE_PREFIX
-from eastworld.miner.slam.isam import ISAM2
+from eastworld.miner.slam.fastslam import FastSLAM
 from eastworld.protocol import Observation
 
 SENSOR_MAX_RANGE = 50.0
@@ -128,7 +128,7 @@ class SeniorAgent(BaseMinerNeuron):
     uid: int
     step: int
     graph: CompiledStateGraph
-    slam: ISAM2
+    slam: FastSLAM
     llm: openai.AsyncOpenAI
     memory: JSONFileMemory
 
@@ -147,9 +147,9 @@ class SeniorAgent(BaseMinerNeuron):
         self.graph = self._build_graph()
 
         if slam_data is None:
-            self.slam = ISAM2(load_data=False, data_dir="slam_data")
+            self.slam = FastSLAM(load_data=False, data_dir="slam_data")
         else:
-            self.slam = ISAM2(load_data=True, data_dir=slam_data)
+            self.slam = FastSLAM(load_data=True, data_dir=slam_data)
 
         # Initialize OpenAI client
         self.llm = openai.AsyncOpenAI(timeout=10)
