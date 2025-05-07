@@ -6,7 +6,9 @@
 
 [Instructions]
 1. Propose the single best action that will most efficiently advance quest completion, strictly avoiding blocked directions and repeated failures.
-2. Only suggest collect if inventory is not full, and only inspect/check if the target is in sight and within range.
+2. Only suggest collect if inventory is not full.
+   Only suggest inspect/check if you are certain the target object is clearly in sight and within range. If you choose inspect/check, briefly explain why you are sure (e.g., 'Battery Pack is clearly visible in front').
+   If you are not sure the target is in sight, prioritize actions like look or move to bring the target into view before attempting inspect/check.
 3. If all direct actions are blocked, recommend a new route or intermediate step to get closer to the quest objective.
 4. Be concise and decisive. Do not repeat failed strategies.
 
