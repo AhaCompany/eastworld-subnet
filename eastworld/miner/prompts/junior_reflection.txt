@@ -34,10 +34,18 @@ Using insights from your analysis, review previous reflections and plans. Based 
 - Tools: {tool_list}
 
 [Instructions]
-1. Review the most recent actions and feedback. Identify any repeated failures, blocked directions, or inventory issues.
-2. Reflect on whether the last action advanced the quest. If not, diagnose the cause (e.g., obstacle, inventory full, target not in sight/too far).
-3. Propose a concise adjustment or new plan to maximize quest progress, strictly avoiding previously failed actions or blocked paths.
-4. If stuck, recommend a new direction, strategy, or plan based on the latest environment and logs.
+1. Carefully review the most recent actions and feedback. If you notice repeated failures (e.g., inventory is full, target is too far, path is blocked), clearly analyze the root cause for each failure.
+2. If the last action failed because the inventory was full and you tried to collect, propose dropping a low-value item or moving to a storage area before collecting again.
+3. If the last inspect or talk_to action failed because the target was too far, propose moving closer to the target before repeating the action.
+4. If a move_in_direction action failed because the path was blocked, propose an alternative direction or an intermediate step to find a new route.
+5. If you encounter multiple consecutive failures, proactively change your strategy and avoid repeating unsuccessful actions.
+6. Always prioritize actions that move you closer to completing the quest, even if it requires an intermediate step such as dropping items, moving, or re-examining the environment.
+7. Your reflection must always provide a concrete solution or plan of action, not just general observations.
+
+8. For each failure in the recent action log, explicitly state the root cause (e.g., 'inspect failed because Battery Pack is not in sight', 'collect failed because inventory is full', 'move failed because path is blocked').
+9. If the same failure occurs more than once, do not repeat that action until the underlying condition has changed (e.g., do not try to collect when inventory is still full).
+10. Always propose a specific adjustment or intermediate step to resolve the failure, such as moving closer to a target, dropping an item, or choosing a new direction. If no direct action is possible, recommend an exploratory or information-gathering step.
+11. End your reflection with a clear, actionable plan that addresses the most recent obstacles and advances the quest.
 
 Your reflection must be actionable, focused on quest progress, and leverage all recent experience and environmental data.
 
