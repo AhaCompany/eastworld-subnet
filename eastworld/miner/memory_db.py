@@ -81,7 +81,7 @@ class JuniorMemoryDB:
             )
             self.conn.commit()
     
-    def get_reflections(self, limit: int = 40) -> List[str]:
+    def get_reflections(self, limit: int = 100) -> List[str]:
         """Get the most recent reflections from the database."""
         with self.lock:
             cursor = self.conn.cursor()
@@ -91,7 +91,7 @@ class JuniorMemoryDB:
             )
             return [row["content"] for row in cursor.fetchall()]
     
-    def get_actions(self, limit: int = 40) -> List[Dict[str, Any]]:
+    def get_actions(self, limit: int = 100) -> List[Dict[str, Any]]:
         """Get the most recent action logs from the database."""
         with self.lock:
             cursor = self.conn.cursor()

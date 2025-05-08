@@ -52,8 +52,8 @@ class JuniorAgent(BaseMinerNeuron):
         super(JuniorAgent, self).__init__(config=config)
 
         # Initialize in-memory caches
-        self.memory_reflection = deque(maxlen=40)
-        self.memory_action = deque(maxlen=40)
+        self.memory_reflection = deque(maxlen=100)
+        self.memory_action = deque(maxlen=100)
         
         # Initialize persistent storage
         self.memory_db = JuniorMemoryDB()
