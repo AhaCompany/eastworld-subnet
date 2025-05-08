@@ -56,9 +56,8 @@ def show_reflections(conn, limit=300):
     print(f"\n=== Reflection Memory ({len(rows)} entries) ===\n")
     
     for row in rows:
-        print(f"ID: {row['id']}")
-        print(f"Timestamp: {row['timestamp']}")
-        print(f"Content: {row['content'][:100]}..." if len(row['content']) > 100 else f"Content: {row['content']}")
+        content_preview = row['content'][:100] + "..." if len(row['content']) > 100 else row['content']
+        print(f"ID: {row['id']} | {row['timestamp']} | {content_preview}")
         print("-" * 80)
 
 def show_actions(conn, limit=300, status_filter=None):
@@ -73,6 +72,8 @@ def show_actions(conn, limit=300, status_filter=None):
     
     # Lọc theo trạng thái nếu có
     filtered_rows = []
+    status_counter = Counter()
+    
     for row in all_rows:
         feedback = row['feedback']
         
@@ -85,6 +86,9 @@ def show_actions(conn, limit=300, status_filter=None):
             row_status = 'PENDING'
         else:
             row_status = 'UNKNOWN'
+        
+        # Đếm số lượng mỗi trạng thái
+        status_counter[row_status] += 1
         
         # Thêm vào danh sách nếu phù hợp với bộ lọc
         if status_filter is None or status_filter.upper() == 'ALL' or status_filter.upper() == row_status:
@@ -99,13 +103,10 @@ def show_actions(conn, limit=300, status_filter=None):
         print(f"\n=== Action Memory ({len(filtered_rows)} entries) ===\n")
     
     for row, status in filtered_rows:
-        print(f"ID: {row['id']}")
-        print(f"Timestamp: {row['timestamp']}")
-        print(f"Action: {row['action']}")
-        print(f"Feedback: {row['feedback'][:100]}..." if len(row['feedback']) > 100 else f"Feedback: {row['feedback']}")
-        print(f"Status: {status}")
-        print(f"Repeat Times: {row['repeat_times']}")
-        print(f"Created At: {row['created_at']}")
+        action_preview = row['action'][:50] + "..." if len(row['action']) > 50 else row['action']
+        feedback_preview = row['feedback'][:50] + "..." if len(row['feedback']) > 50 else row['feedback']
+        print(f"ID: {row['id']} | {row['timestamp']} | Status: {status} | Repeat: {row['repeat_times']}")
+        print(f"Action: {action_preview} | Feedback: {feedback_preview}")
         print("-" * 80)
 
 def analyze_action_status(conn):
@@ -124,26 +125,15 @@ def analyze_action_status(conn):
     for row in rows:
         feedback = row['feedback']
         
-        # Tìm kiếm các mẫu trạng thái cụ thể trong dấu ngoặc vuông [STATUS]
-        success_match = re.search(r'\[SUCCESS\]', feedback)
-        failure_match = re.search(r'\[FAILURE\]', feedback)
-        pending_match = re.search(r'\[PENDING\]', feedback)
-        
-        if success_match:
-            status_counter['Success'] += 1
-        elif failure_match:
-            status_counter['Failure'] += 1
-        elif pending_match:
-            status_counter['Pending'] += 1
-        # Fallback cho các trường hợp không có mẫu trạng thái rõ ràng
-        elif re.search(r'completed|success|succeeded|thành công|hoàn thành', feedback, re.IGNORECASE):
-            status_counter['Success'] += 1
-        elif re.search(r'fail|error|exception|cannot|can\'t|blocked|không thành công|thất bại', feedback, re.IGNORECASE):
-            status_counter['Failure'] += 1
-        elif re.search(r'in progress|pending|waiting|đang xử lý|chờ', feedback, re.IGNORECASE):
-            status_counter['Pending'] += 1
+        # Phân loại trạng thái dựa trên nội dung feedback
+        if re.search(r'\[SUCCESS\]', feedback) or re.search(r'completed|success|succeeded|thành công|hoàn thành', feedback, re.IGNORECASE):
+            status_counter['SUCCESS'] += 1
+        elif re.search(r'\[FAILURE\]', feedback) or re.search(r'fail|error|exception|cannot|can\'t|blocked|không thành công|thất bại', feedback, re.IGNORECASE):
+            status_counter['FAILURE'] += 1
+        elif re.search(r'\[PENDING\]', feedback) or re.search(r'in progress|pending|waiting|đang xử lý|chờ', feedback, re.IGNORECASE):
+            status_counter['PENDING'] += 1
         else:
-            status_counter['Unknown'] += 1
+            status_counter['UNKNOWN'] += 1
     
     # Tạo bảng thống kê
     status_table = []
@@ -195,16 +185,12 @@ def main():
             print("Hãy chạy ứng dụng chính để tạo dữ liệu trước khi sử dụng script này.\n")
             return
         
-        # Hiển thị thông tin tổng quan
+        # Lấy số lượng dữ liệu
         cursor.execute("SELECT COUNT(*) as count FROM reflection_memory")
         reflection_count = cursor.fetchone()['count']
         
         cursor.execute("SELECT COUNT(*) as count FROM action_memory")
         action_count = cursor.fetchone()['count']
-        
-        print(f"\n=== Thống kê cơ sở dữ liệu Junior Memory ===")
-        print(f"Tổng số reflection: {reflection_count}")
-        print(f"Tổng số action: {action_count}")
         
         if reflection_count == 0 and action_count == 0:
             print("\nCảnh báo: Cơ sở dữ liệu không có dữ liệu. Hãy chạy ứng dụng chính để tạo dữ liệu.")
@@ -216,6 +202,11 @@ def main():
         
         if args.show_actions:
             show_actions(conn, args.limit, args.status)
+        
+        # Hiển thị thông tin tổng quan và thống kê ở cuối
+        print(f"\n=== Thống kê cơ sở dữ liệu Junior Memory ===")
+        print(f"Tổng số reflection: {reflection_count}")
+        print(f"Tổng số action: {action_count}")
         
         # Phân tích trạng thái hành động
         if args.show_stats:
