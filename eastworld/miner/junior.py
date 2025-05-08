@@ -97,13 +97,27 @@ class JuniorAgent(BaseMinerNeuron):
         """
         if not self.memory_action:
             # Miner may have restarted and the last action is lost
+            bt.logging.warning("No action in memory to update feedback")
             return
 
+        # Cập nhật feedback trong bộ nhớ tạm thời
         last_log = self.memory_action[-1]
         if last_log.feedback:
             # The last log already has feedback, unexpected behavior
+            bt.logging.warning(f"Last action already has feedback: {last_log.feedback}")
             return
+            
+        # Cập nhật feedback trong bộ nhớ tạm thời
         last_log.feedback = feedback.strip()
+        
+        # Cập nhật feedback trong cơ sở dữ liệu
+        try:
+            # Cập nhật feedback cho hành động gần nhất trong cơ sở dữ liệu
+            success = self.memory_db.update_latest_action_feedback(feedback.strip())
+            if not success:
+                bt.logging.warning("Failed to update feedback in database")
+        except Exception as e:
+            bt.logging.error(f"Error updating feedback in database: {str(e)}")
 
         # Try to merge the last two logs if they are the same
         if len(self.memory_action) < 2:

@@ -96,19 +96,50 @@ class JuniorMemoryDB:
         with self.lock:
             cursor = self.conn.cursor()
             cursor.execute(
-                "SELECT timestamp, action, feedback, repeat_times FROM action_memory ORDER BY created_at DESC LIMIT ?",
+                "SELECT id, timestamp, action, feedback, repeat_times FROM action_memory ORDER BY created_at DESC LIMIT ?",
                 (limit,)
             )
             
             result = []
             for row in cursor.fetchall():
                 result.append({
+                    "id": row["id"],
                     "timestamp": datetime.datetime.fromisoformat(row["timestamp"]),
                     "action": row["action"],
                     "feedback": row["feedback"],
                     "repeat_times": row["repeat_times"]
                 })
             return result
+            
+    def update_action_feedback(self, action_id: int, feedback: str) -> bool:
+        """Update the feedback for a specific action."""
+        with self.lock:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "UPDATE action_memory SET feedback = ? WHERE id = ?",
+                (feedback, action_id)
+            )
+            self.conn.commit()
+            return cursor.rowcount > 0
+            
+    def update_latest_action_feedback(self, feedback: str) -> bool:
+        """Update the feedback for the most recent action."""
+        with self.lock:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "SELECT id FROM action_memory ORDER BY created_at DESC LIMIT 1"
+            )
+            row = cursor.fetchone()
+            if not row:
+                return False
+                
+            action_id = row["id"]
+            cursor.execute(
+                "UPDATE action_memory SET feedback = ? WHERE id = ?",
+                (feedback, action_id)
+            )
+            self.conn.commit()
+            return cursor.rowcount > 0
     
     def close(self):
         """Close the database connection."""
