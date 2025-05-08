@@ -174,6 +174,8 @@ def parse_arguments():
     return args
 
 def main():
+    # Initialize conn to None to avoid UnboundLocalError
+    conn = None
     try:
         # Xử lý tham số dòng lệnh
         args = parse_arguments()
