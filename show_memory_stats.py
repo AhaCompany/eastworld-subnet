@@ -152,9 +152,8 @@ def parse_arguments():
     
     args = parser.parse_args()
     
-    # Nếu không có tham số nào được chỉ định, hiển thị tất cả
+    # Mặc định hiển thị actions và statistics
     if not (args.show_reflections or args.show_actions or args.show_stats):
-        args.show_reflections = True
         args.show_actions = True
         args.show_stats = True
     
