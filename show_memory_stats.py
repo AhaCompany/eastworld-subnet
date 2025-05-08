@@ -44,7 +44,7 @@ def create_tables_if_not_exist(conn):
     
     conn.commit()
 
-def show_reflections(conn, limit=300):
+def show_reflections(conn, limit=10):
     """Hiển thị dữ liệu từ bảng reflection_memory"""
     cursor = conn.cursor()
     cursor.execute(
@@ -59,7 +59,7 @@ def show_reflections(conn, limit=300):
         print(f"ID: {row['id']} | {row['timestamp']} | {row['content']}")
         print("-" * 80)
 
-def show_actions(conn, limit=300, status_filter=None):
+def show_actions(conn, limit=10, status_filter=None):
     """Hiển thị dữ liệu từ bảng action_memory với bộ lọc trạng thái"""
     cursor = conn.cursor()
     
@@ -145,7 +145,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Hiển thị thông tin từ cơ sở dữ liệu Junior Agent memory')
     parser.add_argument('--status', type=str, choices=['all', 'SUCCESS', 'FAILURE', 'PENDING', 'UNKNOWN'], 
                         default='all', help='Lọc theo trạng thái hành động')
-    parser.add_argument('--limit', type=int, default=300, help='Giới hạn số lượng kết quả hiển thị')
+    parser.add_argument('--limit', type=int, default=10, help='Giới hạn số lượng kết quả hiển thị')
     parser.add_argument('--show-reflections', action='store_true', help='Hiển thị dữ liệu reflection')
     parser.add_argument('--show-actions', action='store_true', help='Hiển thị dữ liệu action')
     parser.add_argument('--show-stats', action='store_true', help='Hiển thị thống kê trạng thái')
