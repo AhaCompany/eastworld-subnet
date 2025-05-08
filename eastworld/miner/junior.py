@@ -27,6 +27,7 @@ from pydantic import BaseModel
 
 from eastworld.protocol import Observation
 from eastworld.base.miner import BaseMinerNeuron
+from eastworld.miner.memory_db import JuniorMemoryDB
 
 
 class ActionLog(BaseModel):
@@ -37,8 +38,9 @@ class ActionLog(BaseModel):
 
 
 class JuniorAgent(BaseMinerNeuron):
-    memory_reflection: deque
-    memory_action: deque
+    memory_reflection: deque  # In-memory cache
+    memory_action: deque  # In-memory cache
+    memory_db: JuniorMemoryDB  # Persistent storage
 
     prompt_system_tpl: str
     prompt_reflection_tpl: str
@@ -49,8 +51,15 @@ class JuniorAgent(BaseMinerNeuron):
     def __init__(self, config=None):
         super(JuniorAgent, self).__init__(config=config)
 
+        # Initialize in-memory caches
         self.memory_reflection = deque(maxlen=40)
         self.memory_action = deque(maxlen=40)
+        
+        # Initialize persistent storage
+        self.memory_db = JuniorMemoryDB()
+        
+        # Load initial data from database to memory
+        self._load_memory_from_db()
 
         with open("eastworld/miner/prompts/junior_system.txt", "r") as f:
             self.prompt_system_tpl = f.read()
@@ -62,7 +71,10 @@ class JuniorAgent(BaseMinerNeuron):
         self.http_client = httpx.AsyncClient()
 
     def push_reflection_memory(self, reflection: str):
+        # Add to in-memory cache
         self.memory_reflection.append(reflection)
+        # Add to persistent storage
+        self.memory_db.add_reflection(reflection)
 
     def push_action_memory(self, action: str):
         action_log = ActionLog(
@@ -71,7 +83,10 @@ class JuniorAgent(BaseMinerNeuron):
             feedback="",
             repeat_times=1,
         )
+        # Add to in-memory cache
         self.memory_action.append(action_log)
+        # Add to persistent storage
+        self.memory_db.add_action(action_log.dict())
 
     def update_action_memory(self, feedback: str):
         """
@@ -227,3 +242,36 @@ class JuniorAgent(BaseMinerNeuron):
             traceback.print_exc()
         finally:
             return synapse
+            
+    def _load_memory_from_db(self):
+        """Load memory from database to in-memory caches."""
+        try:
+            # Load reflections
+            reflections = self.memory_db.get_reflections()
+            for reflection in reflections:
+                self.memory_reflection.append(reflection)
+            
+            # Load actions
+            actions = self.memory_db.get_actions()
+            for action_data in actions:
+                action_log = ActionLog(**action_data)
+                self.memory_action.append(action_log)
+                
+            bt.logging.info(f"Loaded {len(reflections)} reflections and {len(actions)} actions from database")
+        except Exception as e:
+            bt.logging.error(f"Error loading memory from database: {str(e)}")
+    
+    def __del__(self):
+        # Close database connection
+        if hasattr(self, "memory_db"):
+            try:
+                self.memory_db.close()
+            except Exception as e:
+                bt.logging.error(f"Error closing memory database: {str(e)}")
+        
+        # Close HTTP client
+        if hasattr(self, "http_client") and self.http_client is not None:
+            try:
+                self.http_client.aclose()
+            except Exception:
+                pass
