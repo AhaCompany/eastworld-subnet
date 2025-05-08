@@ -56,8 +56,7 @@ def show_reflections(conn, limit=300):
     print(f"\n=== Reflection Memory ({len(rows)} entries) ===\n")
     
     for row in rows:
-        content_preview = row['content'][:100] + "..." if len(row['content']) > 100 else row['content']
-        print(f"ID: {row['id']} | {row['timestamp']} | {content_preview}")
+        print(f"ID: {row['id']} | {row['timestamp']} | {row['content']}")
         print("-" * 80)
 
 def show_actions(conn, limit=300, status_filter=None):
@@ -103,10 +102,8 @@ def show_actions(conn, limit=300, status_filter=None):
         print(f"\n=== Action Memory ({len(filtered_rows)} entries) ===\n")
     
     for row, status in filtered_rows:
-        action_preview = row['action'][:50] + "..." if len(row['action']) > 50 else row['action']
-        feedback_preview = row['feedback'][:50] + "..." if len(row['feedback']) > 50 else row['feedback']
         print(f"ID: {row['id']} | {row['timestamp']} | Status: {status} | Repeat: {row['repeat_times']}")
-        print(f"Action: {action_preview} | Feedback: {feedback_preview}")
+        print(f"Action: {row['action']} | Feedback: {row['feedback']}")
         print("-" * 80)
 
 def analyze_action_status(conn):
